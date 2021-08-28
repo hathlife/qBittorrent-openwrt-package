@@ -68,6 +68,8 @@ define Package/qBittorrent/install
 	$(INSTALL_BIN) ./files/qbittorrent $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/root/.config/qBittorrent/config
 	$(CP) ./files/qBittorrent.conf $(1)/root/.config/qBittorrent/config/
+	$(INSTALL_DIR) $(1)/root/.config/qBittorrent/data/GeoDB
+	$(CP) ./files/dbip-country-lite.mmdb $(1)/root/.config/qBittorrent/data/GeoDB/
 	$(INSTALL_DIR) $(1)/root/Downloads
 endef
 
