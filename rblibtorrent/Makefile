@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rblibtorrent
-PKG_VERSION:=1.2.14
-PKG_RELEASE:=1
+PKG_VERSION:=2.0.5
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/arvidn/libtorrent/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=1d5a68a2c78d6e86b0db8bc131aa94dce4cb0eb7a03775a6ac129582dced61c5
+PKG_HASH:=8879d233d81b9bc1b02fdac35f6e1f69509c74da9818c6a819d18b5e42983f56
 PKG_BUILD_DIR:=$(BUILD_DIR)/libtorrent-$(PKG_VERSION)
 
 PKG_MAINTAINER:=Krypton Lee <jun.k.lee199410@outlook.com>
@@ -25,13 +25,14 @@ PKG_USE_MIPS16:=0
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
 
 define Package/rblibtorrent
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Rasterbar BitTorrent Library
   URL:=https://www.libtorrent.org/
-  DEPENDS:=+boost +boost-system +boost-chrono +boost-random +libopenssl +libstdcpp
+  DEPENDS:=+boost-system +libatomic +libopenssl
   MAINTAINER:=Arvid Norberg <arvid@libtorrent.org>
 endef
 
@@ -41,30 +42,29 @@ all the other bittorrent implementations around. It is a library and not a
 full featured client, although it comes with a working example client.
 endef
 
-TARGET_CFLAGS += $(if $(CONFIG_SOFT_FLOAT),-DBOOST_NO_FENV_H) -fPIC
+TRY_SIGNAL_VERSION:=334fd139e2bb387017b42d36753a03935e3bca75
+TRY_SIGNAL_FILE:=$(PKG_NAME)-try_signal-$(TRY_SIGNAL_VERSION).tar.xz
+define Download/try_signal
+	VERSION:=$(TRY_SIGNAL_VERSION)
+	SUBDIR:=deps/try_signal
+	FILE:=$(TRY_SIGNAL_FILE)
+	URL:=https://github.com/arvidn/try_signal.git
+	MIRROR_HASH:=4e7a16dc64e4ad9b25c9358b6dc00117920d16f034858b4c2cab2d31ae066d21
+	PROTO:=git
+endef
 
-EXTRA_CXXFLAGS += $(if $(CONFIG_GCC_VERSION_4_8),-std=gnu++11,-std=gnu++14)
+$(eval $(call Download,try_signal))
 
-TARGET_LDFLAGS += -lstdc++
-
-CONFIGURE_ARGS += \
-	--enable-shared \
-	--enable-static \
-	--disable-debug \
-	--enable-encryption \
-	--with-boost=$(STAGING_DIR)/usr
-
-define Build/Configure
-	cd $(PKG_BUILD_DIR) ; \
-		sh autotool.sh
-	$(call Build/Configure/Default)
+define Build/Prepare
+	$(Build/Prepare/Default)
+	xzcat $(DL_DIR)/$(TRY_SIGNAL_FILE) | tar -C $(PKG_BUILD_DIR) $(TAR_OPTIONS)
 endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/libtorrent $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libtorrent-rasterbar.{a,so*} $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libtorrent-rasterbar.so* $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libtorrent-rasterbar.pc $(1)/usr/lib/pkgconfig/
 endef

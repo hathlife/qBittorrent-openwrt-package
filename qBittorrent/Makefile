@@ -8,31 +8,33 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=qBittorrent
-PKG_VERSION:=4.3.8
-PKG_RELEASE:=1
+PKG_VERSION:=4.4.0
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/qbittorrent/qBittorrent/tar.gz/release-$(PKG_VERSION)?
-PKG_HASH:=cc11f797dd146e6aac8feee8feffb1e429d61551f48b577d32b2239ec5e72ccb
+PKG_HASH:=da240744c6cc5953d7c4d298a02a0cf36d2c8897931819f1e6459bd5270a7c5c
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-release-$(PKG_VERSION)
 
 PKG_MAINTAINER:=Krypton Lee <jun.k.lee199410@outlook.com>
 PKG_LICENSE:=GPL-2.0+
 PKG_LICENSE_FILES:=COPYING
 
+PKG_BUILD_DEPENDS:=qt5tools
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
 PKG_USE_MIPS16:=0
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
 
 define Package/qBittorrent
-  SUBMENU:=BitTorrent
   SECTION:=net
   CATEGORY:=Network
+  SUBMENU:=BitTorrent
   TITLE:=BitTorrent Client Programmed in C++ / Qt
   URL:=https://www.qbittorrent.org/
-  DEPENDS:=+libQt5Core +libQt5Network +libQt5Xml +rblibtorrent
+  DEPENDS:=+libQt5Core +libQt5Network +libQt5Sql +libQt5Xml +rblibtorrent
 endef
 
 define Package/qBittorrent/description
@@ -43,25 +45,17 @@ there. qBittorrent is fast, stable and provides unicode support as
 well as many features.
 endef
 
-CONFIGURE_VARS += \
-	QT_QMAKE=$(STAGING_DIR_HOSTPKG)/bin \
-	QMAKE_LRELEASE=$(STAGING_DIR_HOSTPKG)/bin/lrelease \
-	PKG_CONFIG_PATH=$(STAGING_DIR)/usr/lib/pkgconfig
-
-CONFIGURE_ARGS += \
-	--disable-gui \
-	--with-boost=$(STAGING_DIR)/usr
-
-MAKE_VARS += \
-	INSTALL_ROOT=$(PKG_INSTALL_DIR)
+CMAKE_OPTIONS += \
+	-DGUI=OFF \
+	-DSTACKTRACE=OFF
 
 define Package/$(PKG_NAME)/conffiles
 /root/.config/qBittorrent
 endef
 
 define Package/qBittorrent/install
-	$(INSTALL_DIR) $(1)/usr/man/man1
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/man/man1/qbittorrent-nox.1 $(1)/usr/man/man1/qbittorrent-nox.1
+	$(INSTALL_DIR) $(1)/usr/share/man/man1
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/man/man1/qbittorrent-nox.1 $(1)/usr/share/man/man1/qbittorrent-nox.1
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/qbittorrent-nox $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
