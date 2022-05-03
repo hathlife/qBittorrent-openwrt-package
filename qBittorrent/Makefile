@@ -53,7 +53,7 @@ CMAKE_OPTIONS += \
 	-DQT_ADDITIONAL_PACKAGES_PREFIX_PATH=$(STAGING_DIR_HOSTPKG)
 
 define Package/$(PKG_NAME)/conffiles
-/root/.config/qBittorrent
+/etc/config/qbittorrent
 endef
 
 define Package/qBittorrent/install
@@ -62,11 +62,11 @@ define Package/qBittorrent/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/qbittorrent-nox $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/qbittorrent $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/root/.config/qBittorrent/config
-	$(CP) ./files/qBittorrent.conf $(1)/root/.config/qBittorrent/config/
-	$(INSTALL_DIR) $(1)/root/.config/qBittorrent/data/GeoDB
-	$(CP) ./files/dbip-country-lite.mmdb $(1)/root/.config/qBittorrent/data/GeoDB/
+	$(INSTALL_BIN) ./root/etc/init.d/qbittorrent $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/config
+	$(CP) ./root/etc/config/qbittorrent $(1)/etc/config/
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(CP) ./root/etc/uci-defaults/luci-qbittorrent $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/root/Downloads
 endef
 
