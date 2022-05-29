@@ -34,7 +34,7 @@ You can see the qt5 library packages in `Libraries --> Qt5`, the rblibtorrent (l
 * qBittorrent will run automatically after openwrt start-up. The WebUI runs on port `8080` with default username `admin` and password `adminadmin`. You can change username and password on WebUI setting page after login. By default, the WebUI only can be accessed from LAN side. If you want to access the WebUI from WAN side, you must create a rule in firewall for permitting incoming connections to this port from WAN side.
 * The default save path for downloads is `/root/Downloads/`. You can change it on WebUI setting page. 
 * Port 8999 is used for incoming connections by default. Of course you can change it on WebUI setting page. In order to reach a higher download speed, it is better to create a rule in firewall for permitting incoming connections to this port from WAN side.
-* It's recommanded to configure the profile location on external storage through uci:
+* You can configure the profile location in `luci-app-qbittorrent`, or use uci command:
 ```
 uci set qbittorrent.main.profile "/root/.config"
 ```
